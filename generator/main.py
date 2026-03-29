@@ -13,7 +13,7 @@ from fetch_matches import (
 from render import render_matches_page, write_rendered_page
 
 
-SITE_URL = os.getenv("SITE_URL", "https://example.com")
+SITE_URL = os.getenv("SITE_URL", "https://gleebsergeevi4.github.io/")
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
 
 
