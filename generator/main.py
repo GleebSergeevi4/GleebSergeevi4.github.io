@@ -10,42 +10,17 @@ from fetch_matches import (
     get_tomorrow_matches,
     get_yesterday_matches,
 )
-from render import render_matches_page, write_rendered_page
+from render import render_matches_page, save_root_index, write_rendered_page
 
 
 SITE_URL = os.getenv("SITE_URL", "https://gleebsergeevi4.github.io/")
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
 
 
-def _save_root_index(output_root: Path) -> Path:
-        home = """<!doctype html>
-<html lang=\"ru\">
-<head>
-    <meta charset=\"utf-8\">
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
-    <title>Киберспортивные матчи</title>
-    <meta name=\"description\" content=\"Навигация по страницам матчей: вчера, сегодня, завтра.\">
-</head>
-<body style=\"font-family:Segoe UI,Tahoma,sans-serif;max-width:760px;margin:40px auto;padding:0 16px;\">
-    <h1>Киберспортивные матчи</h1>
-    <p>Выберите страницу:</p>
-    <ul>
-        <li><a href=\"/yesterday/\">Матчи за вчера</a></li>
-        <li><a href=\"/today/\">Матчи на сегодня</a></li>
-        <li><a href=\"/tomorrow/\">Матчи на завтра</a></li>
-    </ul>
-</body>
-</html>
-"""
-        path = output_root / "index.html"
-        path.write_text(home, encoding="utf-8")
-        return path
-
-
 def _save_nojekyll(output_root: Path) -> Path:
-        path = output_root / ".nojekyll"
-        path.write_text("", encoding="utf-8")
-        return path
+    path = output_root / ".nojekyll"
+    path.write_text("", encoding="utf-8")
+    return path
 
 
 def _save_json(output_root: Path, slug: str, matches: list[dict[str, Any]]) -> Path:
@@ -87,7 +62,7 @@ def generate_site(save_api_json: bool = True) -> list[Path]:
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     created_files: list[Path] = [
-        _save_root_index(OUTPUT_DIR),
+        save_root_index(OUTPUT_DIR, SITE_URL),
         _save_nojekyll(OUTPUT_DIR),
     ]
 
