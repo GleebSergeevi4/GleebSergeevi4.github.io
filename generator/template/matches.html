@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>${title}</title>
+	<meta name="description" content="${description}">
+	<link rel="canonical" href="${canonical_url}">
+
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="${og_title}">
+	<meta property="og:description" content="${og_description}">
+	<meta property="og:url" content="${og_url}">
+
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="${og_title}">
+	<meta name="twitter:description" content="${og_description}">
+
+	<script type="application/ld+json">${schema_org_jsonld}</script>
+
+	<style>
+		:root {
+			--bg: #f7f8fb;
+			--surface: #ffffff;
+			--text: #17202a;
+			--muted: #4f5d75;
+			--accent: #e4572e;
+			--line: #dde2eb;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			font-family: "Segoe UI", Tahoma, sans-serif;
+			color: var(--text);
+			background:
+				radial-gradient(circle at 85% -15%, #ffd9cc 0%, transparent 40%),
+				radial-gradient(circle at -10% 10%, #dfe9ff 0%, transparent 35%),
+				var(--bg);
+			min-height: 100vh;
+		}
+
+		.container {
+			max-width: 960px;
+			margin: 0 auto;
+			padding: 24px 16px 48px;
+		}
+
+		header {
+			margin-bottom: 20px;
+		}
+
+		h1 {
+			margin: 0 0 8px;
+			font-size: clamp(28px, 4vw, 42px);
+			line-height: 1.1;
+		}
+
+		.subtitle {
+			margin: 0;
+			color: var(--muted);
+		}
+
+		.panel {
+			background: var(--surface);
+			border: 1px solid var(--line);
+			border-radius: 16px;
+			padding: 16px;
+			box-shadow: 0 10px 30px rgba(20, 30, 50, 0.06);
+		}
+
+		.stats {
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			margin-bottom: 14px;
+			color: var(--muted);
+			font-size: 14px;
+			flex-wrap: wrap;
+		}
+
+		.matches {
+			display: grid;
+			gap: 12px;
+		}
+
+		.match-card {
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			padding: 14px;
+			background: #fff;
+		}
+
+		.teams {
+			font-size: 18px;
+			font-weight: 700;
+		}
+
+		.teams span {
+			color: var(--accent);
+			font-weight: 600;
+			padding: 0 6px;
+		}
+
+		.meta {
+			margin-top: 8px;
+			color: var(--muted);
+		}
+
+		.status {
+			margin-top: 8px;
+			font-weight: 600;
+		}
+
+		.empty {
+			margin: 0;
+			color: var(--muted);
+			font-size: 16px;
+		}
+
+		nav {
+			margin: 18px 0;
+			display: flex;
+			gap: 10px;
+			flex-wrap: wrap;
+		}
+
+		nav a {
+			text-decoration: none;
+			color: #0f3559;
+			background: #e9f2ff;
+			border: 1px solid #c6dcff;
+			border-radius: 999px;
+			padding: 8px 12px;
+			font-size: 14px;
+		}
+	</style>
+</head>
+<body>
+<main class="container">
+	<header>
+		<h1>${h1_title}</h1>
+		<p class="subtitle">Киберспортивные матчи с регулярным обновлением.</p>
+	</header>
+
+	<nav>
+		<a href="/yesterday/">Вчера</a>
+		<a href="/today/">Сегодня</a>
+		<a href="/tomorrow/">Завтра</a>
+	</nav>
+
+	<section class="panel">
+		<div class="stats">
+			<span>Матчей: ${matches_count}</span>
+			<span>Обновлено: ${update_time}</span>
+		</div>
+		<div class="matches">
+			${matches_cards}
+		</div>
+	</section>
+</main>
+</body>
+</html>
