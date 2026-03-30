@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import argparse
 import json
 import os
-import time
-from pathlib import Path
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 from fetch_matches import (
@@ -93,49 +91,11 @@ def generate_site(save_api_json: bool = True) -> list[Path]:
     return created_files
 
 
-def _build_cli() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Генерация статического сайта матчей")
-    parser.add_argument(
-        "--watch",
-        action="store_true",
-        help="Непрерывно обновлять данные и пересобирать страницы",
-    )
-    parser.add_argument(
-        "--interval",
-        type=int,
-        default=60,
-        help="Интервал обновления в секундах для режима --watch (по умолчанию: 60)",
-    )
-    return parser
-
-
-def _run_once() -> None:
+def run_once() -> None:
     files = generate_site()
     for file_path in files:
         print(f"Сгенерировано: {file_path}")
 
 
-def _run_watch(interval: int) -> None:
-    safe_interval = max(60, interval)
-    print(f"Запущен watch-режим. Интервал обновления: {safe_interval} сек.")
-    print("Остановка: Ctrl+C")
-
-    try:
-        while True:
-            print("\n--- Новый цикл генерации ---")
-            try:
-                _run_once()
-            except Exception as exc:
-                print(f"Ошибка обновления: {exc}")
-            print(f"Ожидание {safe_interval} сек. до следующего обновления...")
-            time.sleep(safe_interval)
-    except KeyboardInterrupt:
-        print("\nWatch-режим остановлен.")
-
-
 if __name__ == "__main__":
-    args = _build_cli().parse_args()
-    if args.watch:
-        _run_watch(args.interval)
-    else:
-        _run_once()
+    run_once()
