@@ -5,6 +5,7 @@ import json
 import os
 import time
 from pathlib import Path
+from collections.abc import Callable
 from typing import Any
 
 from fetch_matches import (
@@ -38,27 +39,27 @@ def _save_json(output_root: Path, slug: str, matches: list[dict[str, Any]]) -> P
 
 
 def generate_site(save_api_json: bool = True) -> list[Path]:
-    pages: list[tuple[str, str, str, str, list[dict[str, Any]]]] = [
+    pages: list[tuple[str, str, str, str, Callable[[], list[dict[str, Any]]]]] = [
         (
             "yesterday",
             "Киберспортивные матчи за вчера",
             "Матчи за вчерашний день",
             "Список завершённых киберспортивных матчей за вчерашний день.",
-            get_yesterday_matches(),
+            get_yesterday_matches,
         ),
         (
             "today",
             "Киберспортивные матчи на сегодня",
             "Матчи на сегодняшний день",
             "Актуальный список киберспортивных матчей на сегодня.",
-            get_today_matches(),
+            get_today_matches,
         ),
         (
             "tomorrow",
             "Киберспортивные матчи на завтра",
             "Матчи на завтрашний день",
             "Расписание киберспортивных матчей на завтрашний день.",
-            get_tomorrow_matches(),
+            get_tomorrow_matches,
         ),
     ]
 
@@ -68,7 +69,13 @@ def generate_site(save_api_json: bool = True) -> list[Path]:
         _save_nojekyll(OUTPUT_DIR),
     ]
 
-    for slug, title, h1, description, matches in pages:
+    for slug, title, h1, description, fetcher in pages:
+        try:
+            matches = fetcher()
+        except Exception as exc:
+            print(f"Предупреждение: не удалось получить матчи для '{slug}': {exc}")
+            matches = []
+
         page_url = f"{SITE_URL.rstrip('/')}/{slug}/"
         html = render_matches_page(
             page_title=title,
