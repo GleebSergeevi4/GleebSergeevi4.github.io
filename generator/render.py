@@ -31,6 +31,73 @@ def _team_name(match: dict[str, Any], index: int) -> str:
 	return str(team.get("name") or "TBD")
 
 
+def _human_status(value: str | None) -> str:
+	status_map = {
+		"not_started": "Не начался",
+		"running": "Идет",
+		"finished": "Завершен",
+		"canceled": "Отменен",
+		"postponed": "Перенесен",
+		"interrupted": "Прерван",
+	}
+
+	if not value:
+		return "Статус уточняется"
+
+	normalized = str(value).strip().lower()
+	if normalized in status_map:
+		return status_map[normalized]
+
+	return normalized.replace("_", " ").capitalize()
+
+
+def _format_odds(match: dict[str, Any]) -> str | None:
+	raw_odds = match.get("odds")
+	if not raw_odds:
+		return None
+
+	teams = match.get("opponents") or []
+	team_by_id: dict[int, str] = {}
+	for item in teams:
+		opponent = item.get("opponent") or {}
+		team_id = opponent.get("id")
+		team_name = str(opponent.get("name") or "Команда")
+		if isinstance(team_id, int):
+			team_by_id[team_id] = team_name
+
+	parts: list[str] = []
+
+	if isinstance(raw_odds, dict):
+		for key, value in raw_odds.items():
+			label = key
+			if isinstance(key, str) and key.isdigit() and int(key) in team_by_id:
+				label = team_by_id[int(key)]
+			parts.append(f"{label}: {value}")
+	elif isinstance(raw_odds, list):
+		for item in raw_odds:
+			if not isinstance(item, dict):
+				continue
+
+			value = item.get("value")
+			if value is None:
+				value = item.get("odd")
+			if value is None:
+				continue
+
+			team_id = item.get("opponent_id") or item.get("team_id")
+			if isinstance(team_id, int) and team_id in team_by_id:
+				label = team_by_id[team_id]
+			else:
+				label = str(item.get("name") or item.get("label") or "Исход")
+
+			parts.append(f"{label}: {value}")
+
+	if not parts:
+		return None
+
+	return " | ".join(escape(part) for part in parts)
+
+
 def _match_cards(matches: list[dict[str, Any]]) -> str:
 	if not matches:
 		return '<p class="empty">На выбранную дату матчи не найдены.</p>'
@@ -42,7 +109,8 @@ def _match_cards(matches: list[dict[str, Any]]) -> str:
 
 		league = escape(str((match.get("league") or {}).get("name") or "Без лиги"))
 		serie = escape(str((match.get("serie") or {}).get("name") or ""))
-		status = escape(str(match.get("status") or "unknown"))
+		status = escape(_human_status(str(match.get("status") or "")))
+		odds = _format_odds(match)
 		start_at = _format_time(match.get("begin_at"))
 
 		cards.append(
@@ -52,6 +120,7 @@ def _match_cards(matches: list[dict[str, Any]]) -> str:
 					f'  <div class="teams">{team_a} <span>vs</span> {team_b}</div>',
 					f'  <div class="meta">{league}{(" • " + serie) if serie else ""}</div>',
 					f'  <div class="meta">Старт: {start_at}</div>',
+					f'  <div class="meta">Коэффициенты: {odds}</div>' if odds else "",
 					f'  <div class="status">Статус: {status}</div>',
 					"</article>",
 				]
